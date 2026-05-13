@@ -269,5 +269,27 @@ void freeTree(TreeNode *root)
 
 int main()
 {
-    
+    printf("========== 1. 按完全二叉树层序插入构建 ==========\n");
+    TreeNode *root1 = NULL;
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    printf("依次插入：");
+    for(int i = 0; i < n; i++)
+    {
+        printf("%d ",arr[i]);
+        insertLevelOrder(&root1, arr[i]);
+    }
+    printf("\n层序遍历：");
+    levelOrder(root1);
+    printf("前序遍历：");
+    preorder(root1);
+    printf("\n中序遍历：");
+    inorder(root1);
+    printf("\n后序遍历：");
+    postorder(root1);
+    printf("\n");
+
+    //释放内存
+    freeTree(root1);
+    return 0;
 }
