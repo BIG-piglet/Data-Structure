@@ -251,6 +251,66 @@ void levelOrder(TreeNode *root)
     freeQueue(&q);
 }
 
+// ---------- 统计功能 ----------
+// 计算树的高度（节点数最大层数，空树高度0）
+int getHeight(TreeNode *root)
+{                                             
+    if(root == NULL)                           
+    {                                          
+        //节点为空                               
+        return 0;                              
+    }                                          //这里结合例子更好理解一些，需要自己执行一遍例子的递归过程才能更好理解
+    int leftHeight = getHeight(root->left);
+    int rightHeight = getHeight(root->right);
+    return (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
+}
+
+//计算节点总数
+int countNode(TreeNode *root)
+{
+    if(root == NULL)
+    {
+        return 0;
+    }
+    //当递归到叶子节点的左右孩子后，会返回0
+    //0 + 0 + 1 = 1，这样就得到了一个叶子节点，其他叶子节点同理
+    //叶子节点再与其兄弟节点（如果有）相加 并 +1，依此递推 
+    return countNode(root->left) + countNode(root->right) + 1;
+}
+
+//计算叶子节点数
+int countLeaves(TreeNode *root)
+{
+    if (root == NULL)
+    {
+        return 0;
+    }
+    if (root->left == NULL && root->right == NULL)
+    {
+        //当左右孩子都为空时，返回1,即当前节点为叶子节点
+        return 1;
+    }
+    //通过递归查找到叶子节点，每个叶子节点都会返回1，相加即为叶子节点数
+    return countLeaves(root->left) + countLeaves(root->right);
+}
+
+//普通二叉树查找（必须遍历整棵树，无快速定位）
+//返回是否找到，如果想返回节点，可改为返回指针
+int search(TreeNode *root, int target)
+{
+    if (root == NULL)
+    {
+        return 0;
+    }
+    if (root->data == target)
+    {
+        //找到返回 1
+        return 1;
+    }
+    //通过递归遍历左右子树，左右子树有一方找到便可返回
+    return search(root->left, target) || search(root->right, target);
+}
+
 //释放整棵树的内存
 void freeTree(TreeNode *root)
 {
@@ -279,15 +339,23 @@ int main()
         printf("%d ",arr[i]);
         insertLevelOrder(&root1, arr[i]);
     }
-    printf("\n层序遍历：");
+    printf("\n层序遍历: ");
     levelOrder(root1);
     printf("前序遍历：");
     preorder(root1);
-    printf("\n中序遍历：");
+    printf("\n中序遍历: ");
     inorder(root1);
-    printf("\n后序遍历：");
+    printf("\n后序遍历: ");
     postorder(root1);
     printf("\n");
+
+    printf("树的高度：%d\n", getHeight(root1));
+    printf("节点总数：%d\n", countNode(root1));
+    printf("叶子节点数：%d\n", countLeaves(root1));
+    int target = 5;
+    printf("查找 %d: %s\n", target, search(root1, target) ? "找到" : "未找到");
+    target = 10;
+    printf("查找 %d: %s\n", target, search(root1, target) ? "找到" : "未找到");
 
     //释放内存
     freeTree(root1);
