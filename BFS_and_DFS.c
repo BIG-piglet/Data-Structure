@@ -6,7 +6,7 @@
 //邻接表节点
 typedef struct AdijLisNode 
 {
-    int dest;                   //邻接节点（与顶点相连的那个节点）
+    int dest;                   //节点代号
     struct AdijLisNode *next;   //下一个节点地址
 } AdijLisNode;
 
@@ -77,6 +77,10 @@ void addEdge(Graph *g, int src, int dest)
 }
 
 //--------------------图的遍历--------------------
+
+//图的遍历操作所依据的模型均为邻接矩阵或邻接表这种存储模型（图在计算机中的物理存储）
+//我们画出来的图为逻辑模型
+
 //辅助队列（BFS）
 
 //创建队列
@@ -139,7 +143,74 @@ int dequeue(Queue *q)
     return item;
 }
 
+//遍历算法
+//DFS辅助函数（递归）
+void DFSUtil(Graph *g, int v, int visited[])
+{
+    //用 visited 数组来标记每个节点是否已经被访问
+    visited[v] = 1;
+    //打印已经访问的节点
+    printf("%d ", v);
 
+    //遍历当前顶点的所有邻接点
+    //此处用的是邻接表结构，adjList[] 一个 AdijLisNode * 类型的结构体
+    for (AdijLisNode *curr = g->adjList[v]; curr != NULL; curr = curr->next)
+    {
+        //当节点被访问过 visited[] == 1, !visited[] == 0;
+        if(!visited[curr->dest])
+        {
+            //进入，说明 visited[] 没被访问, 进入递归，进行访问
+            DFSUtil(g, curr->dest, visited);
+        }
+    }
+    //for 循环结束，代表当前顶点的所有分支探索完毕
+}
+//DFS入口
+void DFS(Graph *g, int start)
+{
+    //对 visited 数组全部初始化为未访问（0）
+    int visited[MAX_V] = {0};
+    printf("深度优先遍历(DFS): ");
+    DFSUtil(g, start, visited);
+    printf("\n\n");
+}
+
+//BFS入口
+void BFS(Graph *g, int start)
+{
+    //对 visited 数组全部初始化为未访问（0）
+    int visited[MAX_V] = {0};
+    //创建队列
+    Queue *q = createQueue();
+
+    visited[start] = 1;
+    //入队
+    enqueue(q, start);
+
+    printf("广度优先遍历(BFS): ");
+    //队列 q 不为空，进入
+    while(!isEmpty(q))
+    {
+        //接收出队元素
+        int curr = dequeue(q);
+        printf("%d ",curr);
+
+        //这个for循环的作用在于让与该顶点 相连的 其他未经访问的顶点 入队
+        //当与该顶点 相连的 其他未经访问的顶点 全部入队后，for循环结束
+        //for循环结束后，开始while循环，进行出队操作并打印
+        for(AdijLisNode *temp = g->adjList[curr]; temp != NULL; temp = temp->next)
+        {
+            if(!visited[temp->dest])
+            {
+                visited[temp->dest] = 1;
+                enqueue(q, temp->dest);
+            }
+        }
+    }
+    printf("\n\n");
+    //队列q，调用createQueue 申请了内存空间，这里要释放
+    free(q);
+}
 
 int main()
 {
