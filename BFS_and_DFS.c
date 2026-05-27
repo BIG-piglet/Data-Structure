@@ -212,8 +212,96 @@ void BFS(Graph *g, int start)
     free(q);
 }
 
+//释放内存
+//释放内存遵顼“先子后父”原则，先释放链表节点，再释放整个图结构体
+void freeGraph(Graph *g)
+{
+    //for循环找到邻接表的顶点元素
+    for(int i = 0; i < g->V; i++)
+    {
+        AdijLisNode *curr = g->adjList[i];
+
+        //while循环根据找到的顶点元素，沿着链表一个一个释放元素内存
+        while(curr)
+        {
+            AdijLisNode *temp = curr;
+            curr = curr->next;
+            free(temp);
+        }
+    }
+    //释放图结构体内存
+    free(g);
+}
+
+//--------------------邻接矩阵、邻接表打印--------------------
+
+//打印邻接矩阵
+void printAdjMatrix(Graph *g)
+{
+    printf("----- 邻接矩阵 -----\n");
+    printf("   ");
+    for(int i = 0; i < g->V; i++)
+    {
+        // %3d 为格式化输出控制符，用于控制整数的最小输出宽度（保证矩阵对齐）
+        printf("%3d", i);
+    }
+    printf("\n");
+    for(int i = 0; i < g->V; i++)
+    {
+        printf("%2d ", i);
+        for(int j = 0; j < g->V; j++)
+        {
+            printf("%3d", g->adjMatrix[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+//打印邻接表
+void printAdjList(Graph *g)
+{
+    printf("----- 邻接表 -----\n");
+    for(int i = 0; i < g->V; i++)
+    {
+        printf("[%d] -> ", i);
+        AdijLisNode *curr = g->adjList[i];
+        while(curr)
+        {
+            printf("%d -> ", curr->dest);
+            curr = curr->next;
+        }
+        printf("NULL\n");
+    }
+    printf("\n");
+}
+
 int main()
 {
+    // 创建包含 5 个顶点 (0~4) 的无向图
+    Graph* g = createGraph(5);
+    
+    // 添加边构建图结构
+    // 图示:  0---1---3
+    //        |   |   |
+    //        2---4---+
+    addEdge(g, 0, 1);
+    addEdge(g, 0, 2);
+    addEdge(g, 1, 3);
+    addEdge(g, 1, 4);
+    addEdge(g, 2, 4);
+    addEdge(g, 3, 4);
+    
+    // 打印存储结构
+    printAdjMatrix(g);
+    printAdjList(g);
+    
+    // 从顶点 0 开始遍历
+    DFS(g, 0);
+    BFS(g, 0);
+    
+    // 释放内存
+    freeGraph(g);
     
     return 0;
 }
